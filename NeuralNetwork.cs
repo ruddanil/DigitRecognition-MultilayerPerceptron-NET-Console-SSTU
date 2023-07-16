@@ -1,99 +1,95 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NeuralNetwork
+﻿namespace NeuralNetwork
 {
     public class NeuralNetwork
     {
-        Matrix weights_ih, weights_ho, bias_h, bias_o;
-        public double l_rate = 0.01; // Скорость обучения
-        double[] lossArr;
+        private readonly Matrix _weightsIh;
+        private readonly Matrix _weightsHo;
+        private readonly Matrix _biasH;
+        private readonly Matrix _biasO;
+        public double LRate = 0.01; // Learning Rate
+        private double[] _lossArr;
 
         public NeuralNetwork(int i, int h, int o)
         {
-            weights_ih = new Matrix(h, i); // Матрица весов для входного и скрытого слоя
-            weights_ho = new Matrix(o, h); // Матрица весов для скрытого и выходного слоя
+            _weightsIh = new Matrix(h, i); // Matrix of weights for the input and hidden layer
+            _weightsHo = new Matrix(o, h); // Matrix of weights for the hidden and output layer
 
-            bias_h = new Matrix(h, 1); // Матрица смещения для скрытого слоя
-            bias_o = new Matrix(o, 1); // Матрица смещения для выходного слоя
-
+            _biasH = new Matrix(h, 1); // Offset matrix for the hidden layer
+            _biasO = new Matrix(o, 1); // Offset matrix for the output layer
         }
-        public List<double> predict(double[] X)
+        public List<double> Predict(double[] x)
         {
-            Matrix input = Matrix.fromArray(X);
-            Matrix hidden = Matrix.multiply(weights_ih, input);
-            hidden.add(bias_h);
-            hidden.sigmoid();
+            Matrix input = Matrix.FromArray(x);
+            Matrix hidden = Matrix.Multiply(_weightsIh, input);
+            hidden.Add(_biasH);
+            hidden.Sigmoid();
 
-            Matrix output = Matrix.multiply(weights_ho, hidden);
-            output.add(bias_o);
-            output.sigmoid();
+            Matrix output = Matrix.Multiply(_weightsHo, hidden);
+            output.Add(_biasO);
+            output.Sigmoid();
 
-            return output.toArray();
+            return output.ToArray();
         }
-        public void fit(double[][] X, double[][] Y, int epochs)
+        public void Fit(double[][] x, double[][] y, int epochs)
         {
-            lossArr = new double[epochs];
-            Random rnd = new Random();
+            _lossArr = new double[epochs];
+            Random rnd = new();
             for (int i = 0; i < epochs; i++)
             {
-                int sampleN = rnd.Next(X.Length);
-                train(X[sampleN], Y[sampleN]);
+                int sampleN = rnd.Next(x.Length);
+                Train(x[sampleN], y[sampleN]);
 
-                Matrix input = Matrix.fromArray(X[sampleN]);
-                Matrix hidden = Matrix.multiply(weights_ih, input);
-                hidden.add(bias_h);
-                hidden.sigmoid();
+                Matrix input = Matrix.FromArray(x[sampleN]);
+                Matrix hidden = Matrix.Multiply(_weightsIh, input);
+                hidden.Add(_biasH);
+                hidden.Sigmoid();
 
-                Matrix output = Matrix.multiply(weights_ho, hidden);
-                output.add(bias_o);
-                output.sigmoid();
+                Matrix output = Matrix.Multiply(_weightsHo, hidden);
+                output.Add(_biasO);
+                output.Sigmoid();
 
-                Matrix target = Matrix.fromArray(Y[sampleN]);
+                Matrix target = Matrix.FromArray(y[sampleN]);
 
-                Matrix error = Matrix.subtract(target, output);
-                lossArr[i] = Matrix.mseLoss(error);
+                Matrix error = Matrix.Subtract(target, output);
+                _lossArr[i] = Matrix.MseLoss(error);
             }
         }
-        public void train(double[] X, double[] Y)
+        public void Train(double[] x, double[] y)
         {
-            Matrix input = Matrix.fromArray(X);
-            Matrix hidden = Matrix.multiply(weights_ih, input);
-            hidden.add(bias_h);
-            hidden.sigmoid();
+            Matrix input = Matrix.FromArray(x);
+            Matrix hidden = Matrix.Multiply(_weightsIh, input);
+            hidden.Add(_biasH);
+            hidden.Sigmoid();
 
-            Matrix output = Matrix.multiply(weights_ho, hidden);
-            output.add(bias_o);
-            output.sigmoid();
+            Matrix output = Matrix.Multiply(_weightsHo, hidden);
+            output.Add(_biasO);
+            output.Sigmoid();
 
-            Matrix target = Matrix.fromArray(Y);
+            Matrix target = Matrix.FromArray(y);
 
-            Matrix error = Matrix.subtract(target, output);
-            Matrix gradient = output.dsigmoid();
-            gradient.multiply(error);
-            gradient.multiply(l_rate);
+            Matrix error = Matrix.Subtract(target, output);
+            Matrix gradient = output.Dsigmoid();
+            gradient.Multiply(error);
+            gradient.Multiply(LRate);
 
-            Matrix hidden_T = Matrix.transpose(hidden);
-            Matrix who_delta = Matrix.multiply(gradient, hidden_T);
+            Matrix hiddenT = Matrix.Transpose(hidden);
+            Matrix whoDelta = Matrix.Multiply(gradient, hiddenT);
 
-            weights_ho.add(who_delta);
-            bias_o.add(gradient);
+            _weightsHo.Add(whoDelta);
+            _biasO.Add(gradient);
 
-            Matrix who_T = Matrix.transpose(weights_ho);
-            Matrix hidden_errors = Matrix.multiply(who_T, error);
+            Matrix whoT = Matrix.Transpose(_weightsHo);
+            Matrix hiddenErrors = Matrix.Multiply(whoT, error);
 
-            Matrix h_gradient = hidden.dsigmoid();
-            h_gradient.multiply(hidden_errors);
-            h_gradient.multiply(l_rate);
+            Matrix hGradient = hidden.Dsigmoid();
+            hGradient.Multiply(hiddenErrors);
+            hGradient.Multiply(LRate);
 
-            Matrix i_T = Matrix.transpose(input);
-            Matrix wih_delta = Matrix.multiply(h_gradient, i_T);
+            Matrix iT = Matrix.Transpose(input);
+            Matrix wihDelta = Matrix.Multiply(hGradient, iT);
 
-            weights_ih.add(wih_delta);
-            bias_h.add(h_gradient);
+            _weightsIh.Add(wihDelta);
+            _biasH.Add(hGradient);
         }
     }
 }

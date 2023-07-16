@@ -1,181 +1,161 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NeuralNetwork
+﻿namespace NeuralNetwork
 {
     internal class Matrix
     {
-        Random rnd = new Random();
-        double[][] data;
-        int rows, cols;
+        private readonly double[][] _data;
+        private readonly int _rows, _cols;
 
         public Matrix(int rows, int cols)
         {
-            data = new double[rows][];
+            _data = new double[rows][];
             for (int i = 0; i < rows; i++)
             {
-                data[i] = new double[cols];
+                _data[i] = new double[cols];
             }
-            this.rows = rows;
-            this.cols = cols;
-            for (int i = 0; i < rows; i++)
-            {
-                for (int j = 0; j < cols; j++)
-                {
-                    data[i][j] = (new Random().NextDouble() * 2) - 1;
-                }
-            }
-        }
-        public void add(double scaler)
-        {
+            this._rows = rows;
+            this._cols = cols;
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < cols; j++)
                 {
-                    this.data[i][j] += scaler;
+                    _data[i][j] = (new Random().NextDouble() * 2) - 1;
                 }
             }
         }
-        public void add(Matrix m)
+
+        public void Add(Matrix m)
         {
-            if (cols != m.cols || rows != m.rows)
+            if (_cols != m._cols || _rows != m._rows)
             {
                 Console.WriteLine("Shape Mismatch");
                 return;
             }
 
-            for (int i = 0; i < rows; i++)
+            for (int i = 0; i < _rows; i++)
             {
-                for (int j = 0; j < cols; j++)
+                for (int j = 0; j < _cols; j++)
                 {
-                    this.data[i][j] += m.data[i][j];
+                    this._data[i][j] += m._data[i][j];
                 }
             }
         }
-        public static Matrix subtract(Matrix a, Matrix b)
+        public static Matrix Subtract(Matrix a, Matrix b)
         {
-            Matrix temp = new Matrix(a.rows, a.cols);
-            for (int i = 0; i < a.rows; i++)
+            Matrix temp = new(a._rows, a._cols);
+            for (int i = 0; i < a._rows; i++)
             {
-                for (int j = 0; j < a.cols; j++)
+                for (int j = 0; j < a._cols; j++)
                 {
-                    temp.data[i][j] = a.data[i][j] - b.data[i][j];
-                }
-            }
-            return temp;
-        }
-        public static Matrix transpose(Matrix a)
-        {
-            Matrix temp = new Matrix(a.cols, a.rows);
-            for (int i = 0; i < a.rows; i++)
-            {
-                for (int j = 0; j < a.cols; j++)
-                {
-                    temp.data[j][i] = a.data[i][j];
+                    temp._data[i][j] = a._data[i][j] - b._data[i][j];
                 }
             }
             return temp;
         }
-        public void sigmoid()
+        public static Matrix Transpose(Matrix a)
         {
-            for (int i = 0; i < rows; i++)
+            Matrix temp = new(a._cols, a._rows);
+            for (int i = 0; i < a._rows; i++)
             {
-                for (int j = 0; j < cols; j++)
+                for (int j = 0; j < a._cols; j++)
                 {
-                    this.data[i][j] = 1 / (1 + Math.Exp(-this.data[i][j]));
-                }
-            }
-        }
-        public Matrix dsigmoid()
-        {
-            Matrix temp = new Matrix(rows, cols);
-            for (int i = 0; i < rows; i++)
-            {
-                for (int j = 0; j < cols; j++)
-                {
-                    temp.data[i][j] = this.data[i][j] * (1 - this.data[i][j]);
+                    temp._data[j][i] = a._data[i][j];
                 }
             }
             return temp;
         }
-        public static Matrix multiply(Matrix a, Matrix b)
+        public void Sigmoid()
         {
-            Matrix temp = new Matrix(a.rows, b.cols);
-            for (int i = 0; i < temp.rows; i++)
+            for (int i = 0; i < _rows; i++)
             {
-                for (int j = 0; j < temp.cols; j++)
+                for (int j = 0; j < _cols; j++)
+                {
+                    this._data[i][j] = 1 / (1 + Math.Exp(-this._data[i][j]));
+                }
+            }
+        }
+        public Matrix Dsigmoid()
+        {
+            Matrix temp = new(_rows, _cols);
+            for (int i = 0; i < _rows; i++)
+            {
+                for (int j = 0; j < _cols; j++)
+                {
+                    temp._data[i][j] = this._data[i][j] * (1 - this._data[i][j]);
+                }
+            }
+            return temp;
+        }
+        public static Matrix Multiply(Matrix a, Matrix b)
+        {
+            Matrix temp = new(a._rows, b._cols);
+            for (int i = 0; i < temp._rows; i++)
+            {
+                for (int j = 0; j < temp._cols; j++)
                 {
                     double sum = 0;
-                    for (int k = 0; k < a.cols; k++)
+                    for (int k = 0; k < a._cols; k++)
                     {
-                        sum += a.data[i][k] * b.data[k][j];
+                        sum += a._data[i][k] * b._data[k][j];
                     }
-                    temp.data[i][j] = sum;
+                    temp._data[i][j] = sum;
                 }
             }
             return temp;
         }
-        public void multiply(Matrix a)
+        public void Multiply(Matrix a)
         {
-            for (int i = 0; i < a.rows; i++)
+            for (int i = 0; i < a._rows; i++)
             {
-                for (int j = 0; j < a.cols; j++)
+                for (int j = 0; j < a._cols; j++)
                 {
-                    this.data[i][j] *= a.data[i][j];
+                    this._data[i][j] *= a._data[i][j];
                 }
             }
-
         }
-        public void multiply(double a)
+        public void Multiply(double a)
         {
-            for (int i = 0; i < rows; i++)
+            for (int i = 0; i < _rows; i++)
             {
-                for (int j = 0; j < cols; j++)
+                for (int j = 0; j < _cols; j++)
                 {
-                    this.data[i][j] *= a;
+                    this._data[i][j] *= a;
                 }
             }
-
         }
-        public static Matrix fromArray(double[] x)
+        public static Matrix FromArray(double[] x)
         {
-            Matrix temp = new Matrix(x.Length, 1);
+            Matrix temp = new(x.Length, 1);
 
             for (int i = 0; i < x.Length; i++)
             {
-                temp.data[i][0] = x[i];
+                temp._data[i][0] = x[i];
             }    
                 
             return temp;
         }
-        public List<double> toArray()
+        public List<double> ToArray()
         {
-            List<double> temp = new List<double>();
+            List<double> temp = new();
 
-            for (int i = 0; i < rows; i++)
+            for (int i = 0; i < _rows; i++)
             {
-                for (int j = 0; j < cols; j++)
+                for (int j = 0; j < _cols; j++)
                 {
-                    temp.Add(data[i][j]);
+                    temp.Add(_data[i][j]);
                 }
             }
 
             return temp;
         }
-        public static double mseLoss(Matrix m)
+        public static double MseLoss(Matrix m)
         {
-            double[] diff = new double[m.rows];
-            double sum_sq = 0;
-            for (int i = 0; i < m.rows; i++)
+            double sumSq = 0;
+            for (int i = 0; i < m._rows; i++)
             {
-                sum_sq += Math.Pow(m.data[m.rows - 1][0], 2);
+                sumSq += Math.Pow(m._data[m._rows - 1][0], 2);
             }
 
-            return sum_sq / m.rows;
+            return sumSq / m._rows;
         }
 
     }

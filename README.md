@@ -1,4 +1,4 @@
-# NeuralNetwork-NET-SSTU
+# DigitRecognition-MultilayerPerceptron-NET-Console-SSTU
 
 A simple neural network emulator of a multilayer perceptron without using external library methods for recognizing digits (0, 1, 2 and 3) represented as an array of 0 and 1.
 
